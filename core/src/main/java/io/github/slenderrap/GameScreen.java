@@ -10,22 +10,24 @@ import com.github.czyzby.websocket.WebSocketListener;
 import com.github.czyzby.websocket.WebSocket;
 import com.github.czyzby.websocket.WebSockets;
 
+import jdk.internal.org.jline.utils.Log;
+
 
 public class GameScreen implements Screen {
     private Main main;
     private WebSocket socket;
-    private String address = "localhost";
-    private int port = 8888;
+    private String address = "oarribastaulats.ieti.site";
+    private int port = 443;
     private float stateTime;
     private int posX, posY,posXantic, posYantic ;
 
     // Constructor recibe la clase principal
     public GameScreen(Main main) {
         this.main = main;
-        if (Gdx.app.getType() == Application.ApplicationType.Android) {
-            address = "10.0.2.2"; // Para emulador Android
-        }
-        socket = WebSockets.newSocket(WebSockets.toWebSocketUrl(address, port));
+
+        String wsurl = WebSockets.toSecureWebSocketUrl(address, port);
+        Gdx.app.log("info","intentant conectar-se a "+ wsurl);
+        socket = WebSockets.newSocket(wsurl);
         socket.setSendGracefully(false);
         socket.addListener(new MyWSListener());
         socket.connect();
@@ -43,11 +45,11 @@ public class GameScreen implements Screen {
                 posXantic = posX;
                 posYantic = posY;
                 Gdx.app.log("GameScreen", "Has tocat la pantalla!");
-                socket.send("Enviar dades");
+                socket.send("Has premut a la posició X: " + posX +" i Y: "+posY+" de la pantalla");
             }
         }
 
-        // Limpia la pantalla (opcional)
+
         Gdx.gl.glClearColor(0.15f, 0.15f, 0.2f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
     }
